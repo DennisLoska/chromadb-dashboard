@@ -40,7 +40,7 @@ app.get("/", async (c) => {
     const collections = await listCollections();
     return render(c, () => <CollectionsList collections={collections} />, "Collections");
   } catch (e) {
-    return render(c, () => <CollectionError />, "Error");
+    return render(c, () => <CollectionError message={(e as Error).message} />, "Error");
   }
 });
 

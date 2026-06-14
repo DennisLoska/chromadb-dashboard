@@ -102,6 +102,37 @@ document.addEventListener("click", function(e) {
 })();
 
 // ── Copy to clipboard with event delegation ────────
+function copyDone(btn) {
+  var orig = btn.textContent;
+  btn.textContent = "Copied!";
+  setTimeout(function() { btn.textContent = orig; }, 1500);
+}
+
+function copyFail(btn) {
+  var orig = btn.textContent;
+  btn.textContent = "Failed!";
+  setTimeout(function() { btn.textContent = orig; }, 1500);
+}
+
+function copyExec(text, btn) {
+  var ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.left = "-9999px";
+  // Append inside nearest dialog so modal focus trap doesn't block select()
+  var container = btn.closest("dialog") || document.body;
+  container.appendChild(ta);
+  ta.select();
+  var ok;
+  try {
+    ok = document.execCommand("copy");
+  } catch (_) {
+    ok = false;
+  }
+  container.removeChild(ta);
+  return ok;
+}
+
 document.addEventListener("click", function(e) {
   var btn = e.target.closest("[data-copy-for]");
   if (!btn) return;
@@ -109,34 +140,18 @@ document.addEventListener("click", function(e) {
   var el = $(targetId);
   if (!el) return;
   var text = el.textContent || "";
-  if (navigator.clipboard && navigator.clipboard.writeText) {
+  if (copyExec(text, btn)) {
+    copyDone(btn);
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(function() {
-      var orig = btn.textContent;
-      btn.textContent = "Copied!";
-      setTimeout(function() { btn.textContent = orig; }, 1500);
+      copyDone(btn);
     }).catch(function() {
-      fallbackCopy(text, btn);
+      copyFail(btn);
     });
   } else {
-    fallbackCopy(text, btn);
+    copyFail(btn);
   }
 });
-
-function fallbackCopy(text, btn) {
-  var ta = document.createElement("textarea");
-  ta.value = text;
-  ta.style.position = "fixed";
-  ta.style.left = "-9999px";
-  document.body.appendChild(ta);
-  ta.select();
-  try {
-    var orig = btn.textContent;
-    document.execCommand("copy");
-    btn.textContent = "Copied!";
-    setTimeout(function() { btn.textContent = orig; }, 1500);
-  } catch (_) {}
-  document.body.removeChild(ta);
-}
 
 // ── Record Modal ───────────────────────────────────
 window.showRecord = function(data) {
