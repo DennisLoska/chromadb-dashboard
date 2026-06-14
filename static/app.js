@@ -5,43 +5,39 @@ var qs = document.querySelector.bind(document);
 // ── Theme ──────────────────────────────────────────
 (function() {
   var html = document.documentElement;
-  var cur = html.getAttribute("data-theme") || "dracula";
-  var saved;
-  try { saved = sessionStorage.getItem("chromadb-theme"); } catch (_) {}
-  if (saved) {
-    html.setAttribute("data-theme", saved);
-    cur = saved;
+  var sunIcon = $("theme-icon-sun");
+  var moonIcon = $("theme-icon-moon");
+
+  function updateIcons(theme) {
+    if (!sunIcon || !moonIcon) return;
+    if (theme === "dracula") {
+      sunIcon.classList.remove("hidden");
+      moonIcon.classList.add("hidden");
+    } else {
+      sunIcon.classList.add("hidden");
+      moonIcon.classList.remove("hidden");
+    }
+  }
+
+  var savedTheme;
+  try { savedTheme = sessionStorage.getItem("chromadb-theme"); } catch (_) {}
+  if (savedTheme) {
+    html.setAttribute("data-theme", savedTheme);
+    updateIcons(savedTheme);
   } else {
     html.setAttribute("data-theme", "dracula");
     try { sessionStorage.setItem("chromadb-theme", "dracula"); } catch (_) {}
+    updateIcons("dracula");
   }
-  updateIcons(cur);
+
+  window.toggleTheme = function() {
+    var current = html.getAttribute("data-theme") || "dracula";
+    var next = current === "dracula" ? "bumblebee" : "dracula";
+    html.setAttribute("data-theme", next);
+    try { sessionStorage.setItem("chromadb-theme", next); } catch (_) {}
+    updateIcons(next);
+  };
 })();
-
-function updateIcons(theme) {
-  var sun = $("theme-icon-sun");
-  var moon = $("theme-icon-moon");
-  if (!sun || !moon) return;
-  if (theme === "dracula") {
-    sun.classList.remove("hidden");
-    moon.classList.add("hidden");
-  } else {
-    sun.classList.add("hidden");
-    moon.classList.remove("hidden");
-  }
-}
-
-// Theme toggle via event delegation (no inline onclick fragile)
-document.addEventListener("click", function(e) {
-  var btn = e.target.closest("#theme-toggle");
-  if (!btn) return;
-  var html = document.documentElement;
-  var cur = html.getAttribute("data-theme") || "dracula";
-  var next = cur === "dracula" ? "bumblebee" : "dracula";
-  html.setAttribute("data-theme", next);
-  try { sessionStorage.setItem("chromadb-theme", next); } catch (_) {}
-  updateIcons(next);
-});
 
 // ── Sidebar ────────────────────────────────────────
 function toggleSidebar() {
