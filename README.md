@@ -1,53 +1,113 @@
 # ChromaDB Dashboard
 
-Web UI for browsing and searching ChromaDB collections. Bun + Hono + HTMX + daisyUI.
+Web UI for browsing and searching ChromaDB collections. View records, run similarity searches, and manage collection data.
 
-## Quick Start
+## Stack
+
+| Layer | Technology |
+|-------|------------|
+| Runtime | [Bun](https://bun.sh) |
+| Framework | [Hono](https://hono.dev) |
+| Frontend | [HTMX](https://htmx.org) |
+| Styling | [Tailwind CSS v4](https://tailwindcss.com) + [DaisyUI 5](https://daisyui.com) |
+| Templates | Hono JSX |
+| Database | [ChromaDB](https://www.trychroma.com/) |
+| Bundler | Bun (native) |
+
+## Setup
+
+### Prerequisites
+
+- [Bun](https://bun.sh) >= 1.2
+- ChromaDB server running (default: `http://localhost:8000`)
+
+### Installation
 
 ```bash
-cp .env.example .env      # configure connection
-bun install               # install deps
-bun run build:css         # build tailwind + daisyui
-bun start                 # open http://localhost:4000
+git clone <repo-url> chromadb-dashboard
+cd chromadb-dashboard
+bun install
 ```
 
-## Configuration (`.env`)
+### Configuration
+
+Copy `.env.example` to `.env` and configure:
+
+```bash
+cp .env.example .env
+```
 
 | Variable | Default | Description |
-|---|---|---|
+|----------|---------|-------------|
 | `CHROMA_URL` | `http://localhost:8000` | ChromaDB server address |
 | `EMBEDDING_API_URL` | _(optional)_ | OpenAI-compatible embedding API (LM Studio, vLLM, OpenAI) |
 | `EMBEDDING_MODEL` | _(optional)_ | Model name for embedding API |
 
-**Embeddings:** For text search to work, set `EMBEDDING_API_URL` + `EMBEDDING_MODEL` to an OpenAI-compatible endpoint that matches your collection's embedding dimension. Falls back to built-in 384-dim embedding function when unset.
+**Embeddings:** Text search requires `EMBEDDING_API_URL` + `EMBEDDING_MODEL` matching your collection's embedding dimension. Falls back to built-in 384-dim embedding when unset.
+
+### Building CSS
+
+The project uses Tailwind CSS v4 with DaisyUI. The CSS must be built before running:
+
+```bash
+bun run build:css
+```
+
+This compiles `src/templates/app.css` -> `static/style.css`.
+
+### Running
+
+```bash
+# Development (hot reload)
+bun run dev
+
+# Production
+bun run start
+```
+
+Server starts at **http://0.0.0.0:4000**.
+
+### Available Scripts
+
+| Script | Command | Description |
+|--------|---------|-------------|
+| `dev` | `bun run dev` | Hot-reload development server |
+| `start` | `bun run start` | Production server |
+| `build:css` | `bun run build:css` | Compile Tailwind + DaisyUI into `static/style.css` |
+
+## Environment
+
+- **Port:** `4000` (hardcoded)
+- **Host:** `0.0.0.0` (all interfaces)
+- **ChromaDB:** Default `http://localhost:8000` (configurable via `CHROMA_URL`)
+- **Embedding:** OpenAI-compatible API for text search queries (optional)
 
 ## Features
 
-- Browse collections with record count
-- Paginated record viewer with resizable columns
-- Similarity search via text query
-- Record detail modal with copy-to-clipboard
-- Delete records inline
-- Dark/light theme toggle (persisted in sessionStorage)
+- **Collection Browser** — List all collections with record counts
+- **Paginated Records** — Browse records with resizable columns
+- **Similarity Search** — Query collections by text with semantic search
+- **Record Detail** — Modal viewer with copy-to-clipboard
+- **Delete Records** — Inline record removal
+- **Theme Toggle** — Dark/light mode with session persistence
 
-## Project Structure
+## Architecture
 
 ```
 src/
-  chroma/client.ts    — ChromaDB client + embedding wrapper
-  routes/pages.tsx    — Hono route handlers
-  templates/          — JSX templates (layout, collections, records, query)
+  main.ts              -- Entry point, Hono app bootstrap on port 4000
+  chroma/
+    client.ts          -- ChromaDB client wrapper with embedding support
+  routes/
+    pages.tsx          -- Hono route handlers (collections, records, query)
+  templates/
+    app.css            -- Tailwind CSS source with DaisyUI
+    app.tsx            -- App layout shell
+    layout.tsx         -- HTML document wrapper
+    collections.tsx    -- Collection list view
+    records.tsx        -- Record browser with pagination
+    query.tsx          -- Similarity search view
 static/
-  app.js             — client-side JS (theme, column resize, modals, copy)
-  style.css          — built Tailwind + daisyUI CSS
+  app.js               -- Client-side JS (theme, modals, column resize, copy)
+  style.css            -- Built CSS (generated)
 ```
-
-## Scripts
-
-| Command | Description |
-|---|---|
-| `bun start` | Start production server on port 4000 |
-| `bun run dev` | Start with hot-reload (`bun --hot`) |
-| `bun run build:css` | Rebuild Tailwind + daisyUI CSS |
-
-Built with [Bun](https://bun.sh), [Hono](https://hono.dev), [HTMX](https://htmx.org), [daisyUI](https://daisyui.com), and [ChromaDB](https://www.trychroma.com/).
