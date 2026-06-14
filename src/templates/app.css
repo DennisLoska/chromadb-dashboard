@@ -1,0 +1,82 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@media (min-width: 1024px) {
+  .drawer > .drawer-toggle:checked ~ .drawer-side {
+    width: 16rem;
+    position: relative;
+    visibility: visible;
+    overflow-y: auto;
+  }
+  .drawer > .drawer-toggle:checked ~ .drawer-side > * {
+    opacity: 1;
+    transition: opacity 0.2s;
+  }
+  .drawer > .drawer-toggle:not(:checked) ~ .drawer-side {
+    width: 0;
+    overflow: hidden;
+    visibility: hidden;
+  }
+  .drawer > .drawer-toggle:not(:checked) ~ .drawer-content {
+    width: 100%;
+  }
+}
+
+.table-fixed th {
+  position: relative;
+  user-select: none;
+}
+
+.resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 12px;
+  cursor: col-resize;
+  z-index: 1;
+}
+
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  right: 3px;
+  top: 15%;
+  bottom: 15%;
+  width: 3px;
+  background: oklch(var(--bc) / 0.12);
+  border-radius: 2px;
+  transition: background 0.15s, width 0.15s;
+}
+
+.resize-handle:hover::after,
+.resize-handle.resizing::after {
+  background: oklch(var(--p));
+  width: 4px;
+}
+
+.resize-handle:hover,
+.resize-handle.resizing {
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    oklch(var(--p) / 0.06) 20%,
+    oklch(var(--p) / 0.06) 80%,
+    transparent 100%
+  );
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-row:hover td {
+  background-color: oklch(var(--b3)) !important;
+}
+
+.modal-codeblock {
+  max-height: 60vh;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
