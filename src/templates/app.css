@@ -1,25 +1,9 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-@media (min-width: 1024px) {
-  .drawer > .drawer-toggle:checked ~ .drawer-side {
-    width: 16rem;
-    position: relative;
-    visibility: visible;
-    overflow-y: auto;
-  }
-  .drawer > .drawer-toggle:checked ~ .drawer-side > * {
-    opacity: 1;
-    transition: opacity 0.2s;
-  }
-  .drawer > .drawer-toggle:not(:checked) ~ .drawer-side {
-    width: 0;
-    overflow: hidden;
-    visibility: hidden;
-  }
-  .drawer > .drawer-toggle:not(:checked) ~ .drawer-content {
-    width: 100%;
-  }
+html, body {
+  overflow-y: auto;
+  height: 100%;
 }
 
 .table-fixed th {
@@ -79,4 +63,44 @@
   overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+/* Sidebar desktop collapse via data attribute */
+#app-drawer[data-sidebar-open="false"] #sidebar {
+  width: 0;
+  padding: 0;
+  overflow: hidden;
+  border: none;
+}
+
+#app-drawer[data-sidebar-open="false"] #sidebar > * {
+  opacity: 0;
+}
+
+/* Sidebar overlay visibility */
+#sidebar-overlay:not(.hidden) {
+  display: block;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scrollable main content */
+main {
+  overflow-y: auto;
+  height: calc(100vh - 4rem);
+  scrollbar-width: thin;
+  scrollbar-color: var(--fallback-bc, oklch(var(--bc)/0.3)) transparent;
+}
+
+/* Table horizontal scroll wrapper */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+/* Prevent body scroll when modal open */
+body:has(dialog[open]) {
+  overflow: hidden;
 }

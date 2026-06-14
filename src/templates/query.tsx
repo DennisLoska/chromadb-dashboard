@@ -8,6 +8,31 @@ interface QueryResultsProps {
 
 export const QueryResults = ({ collectionName, queryText, results }: QueryResultsProps) => (
   <div class="space-y-4">
+    <div class="card bg-base-200/60 border border-base-300/50 shadow-xl">
+      <div class="card-body">
+        <h3 class="card-title text-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          New Query
+        </h3>
+        <form
+          hx-post={`/collections/${encodeURIComponent(collectionName)}/query`}
+          hx-target="#content"
+          hx-swap="innerHTML"
+          hx-push-url="true"
+          class="flex gap-2"
+        >
+          <input
+            type="text"
+            name="query"
+            placeholder="Enter search text..."
+            class="input input-bordered flex-1"
+            required
+          />
+          <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+      </div>
+    </div>
+
     <div class="flex items-center justify-between">
       <h2 class="text-2xl font-bold">Query: "{queryText}"</h2>
       <a
@@ -59,28 +84,6 @@ export const QueryResults = ({ collectionName, queryText, results }: QueryResult
           </div>
         </div>
       ))}
-    </div>
-
-    <div class="card bg-base-200/60 border border-base-300/50 shadow-xl">
-      <div class="card-body">
-        <h3 class="card-title text-lg">New Query</h3>
-        <form
-          hx-post={`/collections/${encodeURIComponent(collectionName)}/query`}
-          hx-target="#content"
-          hx-swap="innerHTML"
-          hx-push-url="true"
-          class="flex gap-2"
-        >
-          <input
-            type="text"
-            name="query"
-            placeholder="Enter search text..."
-            class="input input-bordered flex-1"
-            required
-          />
-          <button type="submit" class="btn btn-primary">Search</button>
-        </form>
-      </div>
     </div>
   </div>
 );

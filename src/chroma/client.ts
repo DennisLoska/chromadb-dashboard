@@ -4,7 +4,7 @@ import { DefaultEmbeddingFunction } from "@chroma-core/default-embed";
 const CHROMA_URL = process.env.CHROMA_URL || "http://localhost:8000";
 const PAGE_SIZE = 20;
 const CONNECTION_TIMEOUT = 5_000;
-const EMBED_URL = process.env.EMBEDDING_MODEL_URL || "";
+const EMBED_API_URL = process.env.EMBEDDING_API_URL || "";
 const EMBED_MODEL = process.env.EMBEDDING_MODEL || "";
 
 const parsedUrl = new URL(CHROMA_URL);
@@ -14,9 +14,9 @@ const CHROMA_OPTIONS = {
   ssl: parsedUrl.protocol === "https:",
 };
 
-class LmStudioEmbedder {
+class ApiEmbedder {
   async generate(texts: string[]): Promise<number[][]> {
-    const res = await fetch(EMBED_URL, {
+    const res = await fetch(EMBED_API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ model: EMBED_MODEL, input: texts }),
@@ -30,8 +30,8 @@ class LmStudioEmbedder {
   }
 }
 
-const embedder = EMBED_URL && EMBED_MODEL
-  ? new LmStudioEmbedder()
+const embedder = EMBED_API_URL && EMBED_MODEL
+  ? new ApiEmbedder()
   : new DefaultEmbeddingFunction();
 
 let _client: ChromaClient | null = null;
@@ -147,9 +147,7 @@ export async function renameCollection(oldName: string, newName: string): Promis
     const docs = (response.documents ?? []) as string[];
     const embs = (response.embeddings ?? []) as number[][];
     const metas = (response.metadatas ?? []) as Metadata[];
-    if (docs.length > 0 || embs.length > 0) {
-      await newCol.add({ ids: response.ids, documents: docs, embeddings: embs, metadatas: metas });
-    }
+    await newCol.add({ ids: response.ids, documents: docs, embeddings: embs, metadatas: metas });
   }
   await client.deleteCollection({ name: oldName });
 }
