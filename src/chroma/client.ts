@@ -1,7 +1,8 @@
 import { ChromaClient, type Metadata } from "chromadb";
 import { DefaultEmbeddingFunction } from "@chroma-core/default-embed";
 
-const CHROMA_URL = process.env.CHROMA_URL || "http://localhost:8000";
+const CHROMA_URL = process.env.CHROMA_URL;
+if (!CHROMA_URL) throw new Error("CHROMA_URL not set in .env");
 const PAGE_SIZE = 20;
 const CONNECTION_TIMEOUT = 5_000;
 const EMBED_API_URL = process.env.EMBEDDING_API_URL || "";
@@ -9,7 +10,7 @@ const EMBED_MODEL = process.env.EMBEDDING_MODEL || "";
 
 const parsedUrl = new URL(CHROMA_URL);
 const CHROMA_OPTIONS = {
-  host: parsedUrl.hostname,
+  host: parsedUrl.hostname === "localhost" ? "127.0.0.1" : parsedUrl.hostname,
   port: parseInt(parsedUrl.port, 10) || 8000,
   ssl: parsedUrl.protocol === "https:",
 };

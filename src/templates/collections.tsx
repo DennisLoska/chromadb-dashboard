@@ -43,12 +43,12 @@ export const CollectionsList = ({ collections }: { collections: ChromaCollection
   </div>
 );
 
-export const CollectionError = () => (
+export const CollectionError = ({ message }: { message?: string }) => (
   <div class="card bg-error/10 border border-error/30 shadow-xl">
     <div class="card-body text-center py-12">
       <p class="text-lg font-semibold text-error">Connection Error</p>
       <p class="text-sm mt-2 text-base-content/60">
-        Could not connect to ChromaDB. Check your CHROMA_URL in .env and ensure the server is running.
+        {message || "Could not connect to ChromaDB. Check your CHROMA_URL in .env and ensure the server is running."}
       </p>
     </div>
   </div>
