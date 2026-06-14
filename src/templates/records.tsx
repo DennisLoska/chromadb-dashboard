@@ -147,14 +147,14 @@ export const RecordsTable = ({ collectionName, records, total, page, pageSize }:
             <div>
               <div class="flex items-center justify-between mb-1">
                 <h4 class="text-sm font-semibold text-base-content/60">Document</h4>
-                <button class="btn btn-xs btn-ghost" onclick="copyContent('modal-document')">Copy</button>
+                <button class="btn btn-xs btn-ghost" data-copy-for="modal-document">Copy</button>
               </div>
               <pre class="bg-base-300 rounded-lg p-3 text-sm modal-codeblock"><code id="modal-document" /></pre>
             </div>
             <div>
               <div class="flex items-center justify-between mb-1">
                 <h4 class="text-sm font-semibold text-base-content/60">Metadata</h4>
-                <button class="btn btn-xs btn-ghost" onclick="copyContent('modal-metadata')">Copy</button>
+                <button class="btn btn-xs btn-ghost" data-copy-for="modal-metadata">Copy</button>
               </div>
               <pre class="bg-base-300 rounded-lg p-3 text-sm max-h-48 overflow-y-auto whitespace-pre-wrap"><code id="modal-metadata" /></pre>
             </div>

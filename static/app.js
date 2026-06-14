@@ -1,5 +1,6 @@
 (function () {
   var html = document.documentElement;
+  var body = document.body;
 
   function get(id) { return document.getElementById(id); }
 
@@ -11,33 +12,28 @@
     try { sessionStorage.setItem("chromadb-theme", t); } catch (e) {}
   }
 
-  function updateIcons(theme) {
+  function setTheme(t) {
+    html.setAttribute("data-theme", t);
+    saveTheme(t);
     var sun = get("theme-icon-sun");
     var moon = get("theme-icon-moon");
-    if (!sun || !moon) return;
-    if (theme === "dracula") {
-      sun.classList.remove("hidden");
-      moon.classList.add("hidden");
-    } else {
-      sun.classList.add("hidden");
-      moon.classList.remove("hidden");
+    if (sun && moon) {
+      if (t === "dracula") {
+        sun.classList.remove("hidden");
+        moon.classList.add("hidden");
+      } else {
+        sun.classList.add("hidden");
+        moon.classList.remove("hidden");
+      }
     }
   }
 
   var saved = loadSavedTheme();
-  if (saved) {
-    html.setAttribute("data-theme", saved);
-    updateIcons(saved);
-  } else {
-    html.setAttribute("data-theme", "dracula");
-  }
+  setTheme(saved || "dracula");
 
   window.toggleTheme = function () {
     var cur = html.getAttribute("data-theme");
-    var next = cur === "dracula" ? "bumblebee" : "dracula";
-    html.setAttribute("data-theme", next);
-    saveTheme(next);
-    updateIcons(next);
+    setTheme(cur === "dracula" ? "bumblebee" : "dracula");
   };
 
   var toggle = get("main-drawer");
@@ -70,19 +66,21 @@
     modal.showModal();
   };
 
-  window.copyContent = function (id) {
-    var el = get(id);
-    if (!el) return;
-    var text = el.textContent;
-    navigator.clipboard.writeText(text).then(function () {
-      var btns = document.querySelectorAll("[onclick*=\"copyContent('" + id + "')\"]");
-      btns.forEach(function (btn) {
-        var orig = btn.textContent;
-        btn.textContent = "Copied!";
-        setTimeout(function () { btn.textContent = orig; }, 2000);
+  document.addEventListener("click", function (e) {
+    var copyBtn = e.target.closest("[data-copy-for]");
+    if (copyBtn) {
+      var targetId = copyBtn.getAttribute("data-copy-for");
+      var el = get(targetId);
+      if (!el) return;
+      navigator.clipboard.writeText(el.textContent).then(function () {
+        var orig = copyBtn.textContent;
+        copyBtn.textContent = "Copied!";
+        setTimeout(function () { copyBtn.textContent = orig; }, 2000);
       });
-    });
-  };
+      return;
+    }
+    if (e.target.closest("[onclick*='stopPropagation']")) return;
+  });
 
   var resizeState = null;
 
@@ -129,15 +127,6 @@
     document.removeEventListener("mousemove", onMouseMove);
     document.removeEventListener("mouseup", onMouseUp);
   }
-
-  document.addEventListener("click", function (e) {
-    var btn = e.target.closest("#theme-toggle");
-    if (btn) {
-      window.toggleTheme();
-      return;
-    }
-    if (e.target.closest("[onclick*='stopPropagation']")) return;
-  });
 
   initColumnResize();
 

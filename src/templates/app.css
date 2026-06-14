@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+html, body {
+  overflow-y: auto;
+  height: 100%;
+}
+
 @media (min-width: 1024px) {
   .drawer > .drawer-toggle:checked ~ .drawer-side {
     width: 16rem;
