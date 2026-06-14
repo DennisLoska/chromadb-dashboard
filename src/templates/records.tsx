@@ -8,6 +8,28 @@ interface RecordsTableProps {
   pageSize: number;
 }
 
+function getPaginationItems(current: number, total: number): (number | string)[] {
+  if (total <= 5) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  const items: (number | string)[] = [];
+
+  if (current <= 3) {
+    for (let i = 1; i <= 5; i++) items.push(i);
+    items.push("...", total);
+  } else if (current >= total - 2) {
+    items.push(1, "...");
+    for (let i = total - 4; i <= total; i++) items.push(i);
+  } else {
+    items.push(1, "...");
+    for (let i = current - 1; i <= current + 1; i++) items.push(i);
+    items.push("...", total);
+  }
+
+  return items;
+}
+
 export const RecordsTable = ({ collectionName, records, total, page, pageSize }: RecordsTableProps) => {
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   return (
@@ -117,20 +139,46 @@ export const RecordsTable = ({ collectionName, records, total, page, pageSize }:
       </div>
 
       <div class="flex items-center justify-center gap-2 pb-4">
+        <a
+          href={page > 1 ? `/collections/${encodeURIComponent(collectionName)}?page=${page - 1}` : "#"}
+          hx-get={page > 1 ? `/collections/${encodeURIComponent(collectionName)}?page=${page - 1}` : undefined}
+          hx-target="#content"
+          hx-swap="innerHTML"
+          hx-push-url="true"
+          class={`join-item btn btn-sm ${page === 1 ? "btn-disabled" : ""}`}
+          aria-label="Previous page"
+        >
+          ← Prev
+        </a>
         <div class="join">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <a
-              href={`/collections/${encodeURIComponent(collectionName)}?page=${p}`}
-              hx-get={`/collections/${encodeURIComponent(collectionName)}?page=${p}`}
-              hx-target="#content"
-              hx-swap="innerHTML"
-              hx-push-url="true"
-              class={`join-item btn btn-sm ${p === page ? "btn-active" : ""}`}
-            >
-              {p}
-            </a>
-          ))}
+          {getPaginationItems(page, totalPages).map((item) =>
+            item === "..." ? (
+              <span class="join-item btn btn-sm btn-disabled">...</span>
+            ) : (
+              <a
+                href={`/collections/${encodeURIComponent(collectionName)}?page=${item}`}
+                hx-get={`/collections/${encodeURIComponent(collectionName)}?page=${item}`}
+                hx-target="#content"
+                hx-swap="innerHTML"
+                hx-push-url="true"
+                class={`join-item btn btn-sm ${item === page ? "btn-active" : ""}`}
+              >
+                {item}
+              </a>
+            )
+          )}
         </div>
+        <a
+          href={page < totalPages ? `/collections/${encodeURIComponent(collectionName)}?page=${page + 1}` : "#"}
+          hx-get={page < totalPages ? `/collections/${encodeURIComponent(collectionName)}?page=${page + 1}` : undefined}
+          hx-target="#content"
+          hx-swap="innerHTML"
+          hx-push-url="true"
+          class={`join-item btn btn-sm ${page === totalPages ? "btn-disabled" : ""}`}
+          aria-label="Next page"
+        >
+          Next →
+        </a>
       </div>
 
       <dialog id="record-modal" class="modal">
