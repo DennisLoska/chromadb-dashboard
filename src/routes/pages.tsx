@@ -82,13 +82,14 @@ app.post("/collections/:name/query", async (c) => {
       `Query: ${queryText}`,
     );
   } catch (e) {
+    const msg = (e as Error).message;
     return render(
       c,
       () => (
         <div class="card bg-error/10 border border-error/30 shadow-xl">
           <div class="card-body text-center py-12">
             <p class="text-lg font-semibold text-error">Query failed</p>
-            <p class="text-sm mt-2">{(e as Error).message}</p>
+            <p class="text-sm mt-2">{msg}</p>
           </div>
         </div>
       ),
