@@ -2,6 +2,8 @@
 
 Web UI for browsing and searching ChromaDB collections. View records, run similarity searches, and manage collection data.
 
+<img width="2560" height="1440" alt="screenshot-2026-06-14_16-39-18" src="https://github.com/user-attachments/assets/95df53f3-6b9e-412d-afc8-d1bbc69a8770" />
+
 ## Stack
 
 | Layer | Technology |
