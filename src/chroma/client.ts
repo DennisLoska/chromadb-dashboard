@@ -2,14 +2,31 @@ import { ChromaClient, type Metadata } from "chromadb";
 
 const CHROMA_URL = process.env.CHROMA_URL || "http://localhost:8000";
 const PAGE_SIZE = 20;
+const CONNECTION_TIMEOUT = 5_000;
+
+const parsedUrl = new URL(CHROMA_URL);
+const CHROMA_OPTIONS = {
+  host: parsedUrl.hostname,
+  port: parseInt(parsedUrl.port, 10) || 8000,
+  ssl: parsedUrl.protocol === "https:",
+};
 
 let _client: ChromaClient | null = null;
 
 function getClient(): ChromaClient {
   if (!_client) {
-    _client = new ChromaClient({ path: CHROMA_URL });
+    _client = new ChromaClient({ ...CHROMA_OPTIONS });
   }
   return _client;
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("ChromaDB connection timed out")), ms),
+    ),
+  ]);
 }
 
 export type ChromaCollection = {
@@ -27,6 +44,7 @@ export type ChromaRecord = {
 
 export async function listCollections(): Promise<ChromaCollection[]> {
   const client = getClient();
+  await withTimeout(client.heartbeat(), CONNECTION_TIMEOUT);
   const collections = await client.listCollections();
   const result: ChromaCollection[] = [];
   for (const col of collections) {
